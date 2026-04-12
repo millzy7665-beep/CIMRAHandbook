@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "CIMRS",
-    "slug": "CIMRS",
+    "name": "Cayman Motorcycle Handbook",
+    "slug": "cimrs-handbook",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -11,16 +11,21 @@
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0a0f1e"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cimrs.handbook"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0a0f1e"
       },
+      "package": "com.cimrs.handbook",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
@@ -34,6 +39,11 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "local-offline-project"
+      }
     }
   }
 }
