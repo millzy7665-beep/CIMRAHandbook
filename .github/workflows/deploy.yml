@@ -34,17 +34,9 @@ jobs:
         run: npm ci
 
       - name: Export web build
-        run: npx expo export -p web
-
-      - name: Copy PWA files into dist
         run: |
-          cp public/manifest.json dist/manifest.json
-          cp public/sw.js dist/sw.js
-
-      - name: Add PWA link tags to index
-        run: |
-          sed -i 's|</head>|<link rel="manifest" href="/manifest.json"><meta name="theme-color" content="#4fd1c5"></head>|' dist/index.html || true
-          sed -i 's|</body>|<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/sw.js")}</script></body>|' dist/index.html || true
+          npx expo export -p web
+          touch dist/.nojekyll
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

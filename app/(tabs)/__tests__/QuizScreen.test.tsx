@@ -1,35 +1,46 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import QuizScreen from "../QuizScreen";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
+
+import QuizScreen from "../quiz";
 
 jest.useFakeTimers();
 
 describe("QuizScreen", () => {
+  afterEach(() => {
+    jest.clearAllTimers();
+  });
+
   it("renders start screen and starts quiz", () => {
-    const { getByText } = render(<QuizScreen />);
+    const { getByTestId, getByText } = render(<QuizScreen />);
+
     expect(getByText("Practice Quiz")).toBeTruthy();
-    fireEvent.press(getByText("Start Quiz →"));
+    fireEvent.press(getByTestId("start-quiz-button"));
     expect(getByText(/Question 1/)).toBeTruthy();
   });
 
   it("selects an answer and shows feedback", async () => {
-    const { getByText, queryByText } = render(<QuizScreen />);
-    fireEvent.press(getByText("Start Quiz →"));
-    const option = getByText(/.+/i);
-    fireEvent.press(option);
+    const { getAllByTestId, getByTestId, queryByText } = render(<QuizScreen />);
+
+    fireEvent.press(getByTestId("start-quiz-button"));
+    fireEvent.press(getAllByTestId("quiz-option")[0]);
+
     await waitFor(() => {
       expect(queryByText(/✓ Correct!|✗ Incorrect/)).toBeTruthy();
     });
   });
 
   it("completes the quiz and shows results", async () => {
-    const { getByText, queryByText, getAllByText } = render(<QuizScreen />);
-    fireEvent.press(getByText("Start Quiz →"));
+    const { getAllByTestId, getByTestId, queryByText } = render(<QuizScreen />);
+
+    fireEvent.press(getByTestId("start-quiz-button"));
+
     for (let i = 0; i < 15; i++) {
-      const option = getAllByText(/.+/i)[0];
-      fireEvent.press(option);
-      jest.advanceTimersByTime(800);
+      fireEvent.press(getAllByTestId("quiz-option")[0]);
+      act(() => {
+        jest.advanceTimersByTime(800);
+      });
     }
+
     await waitFor(() => {
       expect(queryByText("Quiz Complete!")).toBeTruthy();
     });

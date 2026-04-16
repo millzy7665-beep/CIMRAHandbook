@@ -17,6 +17,28 @@ export default function QuizScreen() {
     return [...pool].sort(() => Math.random() - 0.5).slice(0, 15);
   }, [category, started]);
 
+  function handleRestart() {
+    setStarted(false);
+    setCurrent(0);
+    setSelected(null);
+    setAnswers([]);
+    setShowResult(false);
+  }
+
+  if (started && quizQuestions.length === 0) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0f1e" }}>
+        <View style={styles.resultContainer}>
+          <Text style={styles.resultTitle}>Quiz Unavailable</Text>
+          <Text style={styles.quizDesc}>No questions are available for the selected topic yet.</Text>
+          <TouchableOpacity style={styles.startBtn} onPress={handleRestart}>
+            <Text style={styles.startBtnText}>Back</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const handleSelect = (idx: number) => {
     if (selected !== null) return;
     setSelected(idx);
@@ -29,14 +51,6 @@ export default function QuizScreen() {
         setShowResult(true);
       }
     }, 700);
-  };
-
-  const handleRestart = () => {
-    setStarted(false);
-    setCurrent(0);
-    setSelected(null);
-    setAnswers([]);
-    setShowResult(false);
   };
 
   if (!started) {
@@ -64,7 +78,7 @@ export default function QuizScreen() {
               </TouchableOpacity>
             ))}
           </View>
-          <TouchableOpacity style={styles.startBtn} onPress={() => setStarted(true)}>
+          <TouchableOpacity testID="start-quiz-button" style={styles.startBtn} onPress={() => setStarted(true)}>
             <Text style={styles.startBtnText}>Start Quiz →</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -101,6 +115,10 @@ export default function QuizScreen() {
   }
 
   const q = quizQuestions[current];
+  if (!q) {
+    return null;
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0f1e" }}>
       <View style={styles.quizContainer}>
@@ -109,6 +127,7 @@ export default function QuizScreen() {
         {q.options.map((opt, idx) => (
           <TouchableOpacity
             key={idx}
+            testID="quiz-option"
             style={[
               styles.optBtn,
               selected === idx && (idx === q.correctIndex ? styles.correctOpt : styles.incorrectOpt),

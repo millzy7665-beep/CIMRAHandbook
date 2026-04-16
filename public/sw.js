@@ -1,9 +1,11 @@
-const CACHE_NAME = "cimrs-v1";
-const STATIC_ASSETS = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-];
+const CACHE_NAME = "cimrs-v2";
+const SCOPE_PATH = new URL(self.registration.scope).pathname.replace(/\/$/, "");
+
+function withBase(path) {
+  return `${SCOPE_PATH}${path}` || "/";
+}
+
+const STATIC_ASSETS = [withBase("/"), withBase("/index.html"), withBase("/manifest.json")];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -34,7 +36,7 @@ self.addEventListener("fetch", (event) => {
             }
             return response;
           })
-          .catch(() => caches.match("/"))
+          .catch(() => caches.match(withBase("/")))
       );
     })
   );

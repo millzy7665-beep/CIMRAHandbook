@@ -38,6 +38,7 @@
       "expo-router"
     ],
     "experiments": {
+      "baseUrl": "/CIMRAHandbook",
       "typedRoutes": true
     },
     "extra": {

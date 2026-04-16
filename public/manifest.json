@@ -2,19 +2,19 @@
   "name": "Cayman Motorcycle Handbook",
   "short_name": "CIMRS",
   "description": "Interactive offline handbook and quiz app for the Cayman Islands motorcycle licence.",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0a0f1e",
   "theme_color": "#4fd1c5",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "./favicon.png",
       "sizes": "196x196",
       "type": "image/png"
     },
     {
-      "src": "/favicon.png",
+      "src": "./favicon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
