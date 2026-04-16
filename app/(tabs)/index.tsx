@@ -1,16 +1,19 @@
-import React, { useRef, useState } from "react";
-import { View, Text, StyleSheet, Dimensions, SafeAreaView } from "react-native";
-import Carousel from "react-native-snap-carousel";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from "react-native";
 import { handbookSections } from "../../data/handbook";
-
-const { width } = Dimensions.get("window");
 
 export default function HandbookScreen() {
   const [sectionIndex, setSectionIndex] = useState(0);
+  const [chapterIndex, setChapterIndex] = useState(0);
   const section = handbookSections[sectionIndex];
-  const carouselRef = useRef<Carousel<any>>(null);
+  const chapter = section?.content[chapterIndex];
 
   if (!section) return null;
+
+  function goToSection(nextIndex: number) {
+    setSectionIndex(nextIndex);
+    setChapterIndex(0);
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#0a0f1e" }}>
@@ -19,45 +22,69 @@ export default function HandbookScreen() {
         <Text style={styles.title}>{section.title}</Text>
         <Text style={styles.summary}>{section.summary}</Text>
       </View>
-      <Carousel
-        ref={carouselRef}
-        data={section.content}
-        renderItem={({ item, index }: any) => (
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {chapter ? (
           <View style={styles.page}>
-            <Text style={styles.chapterHeading}>{index + 1}. {item.heading}</Text>
-            {item.body.map((para: string, i: number) => (
-              <Text key={i} style={styles.body}>{para}</Text>
+            <Text style={styles.chapterHeading}>{chapterIndex + 1}. {chapter.heading}</Text>
+            {chapter.body.map((para: string, index: number) => (
+              <Text key={index} style={styles.body}>{para}</Text>
             ))}
-            {item.tip && (
+            {chapter.tip ? (
               <View style={styles.tipBox}>
                 <Text style={styles.tipEmoji}>💡</Text>
-                <Text style={styles.tip}>{item.tip}</Text>
+                <Text style={styles.tip}>{chapter.tip}</Text>
               </View>
-            )}
+            ) : null}
+          </View>
+        ) : (
+          <View style={styles.page}>
+            <Text style={styles.chapterHeading}>No chapter available</Text>
           </View>
         )}
-        sliderWidth={width}
-        itemWidth={width * 0.92}
-        layout={"default"}
-        inactiveSlideScale={0.96}
-        inactiveSlideOpacity={0.7}
-        containerCustomStyle={{ flexGrow: 0 }}
-        contentContainerCustomStyle={{ alignItems: "center" }}
-      />
+
+        <View style={styles.chapterNav}>
+          <TouchableOpacity
+            disabled={chapterIndex === 0}
+            onPress={() => setChapterIndex((currentIndex) => Math.max(0, currentIndex - 1))}
+          >
+            <Text style={[styles.sectionNavBtn, chapterIndex === 0 && styles.disabledBtn]}>← Prev Chapter</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionNavTitle}>
+            Chapter {Math.min(chapterIndex + 1, section.content.length)} / {section.content.length}
+          </Text>
+          <TouchableOpacity
+            disabled={chapterIndex >= section.content.length - 1}
+            onPress={() => setChapterIndex((currentIndex) => Math.min(section.content.length - 1, currentIndex + 1))}
+          >
+            <Text
+              style={[
+                styles.sectionNavBtn,
+                chapterIndex >= section.content.length - 1 && styles.disabledBtn,
+              ]}
+            >
+              Next Chapter →
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
       <View style={styles.sectionNav}>
-        <Text
-          style={[styles.sectionNavBtn, sectionIndex === 0 && styles.disabledBtn]}
-          onPress={() => sectionIndex > 0 && setSectionIndex(sectionIndex - 1)}
-        >
-          ← Prev Section
-        </Text>
+        <TouchableOpacity disabled={sectionIndex === 0} onPress={() => goToSection(sectionIndex - 1)}>
+          <Text style={[styles.sectionNavBtn, sectionIndex === 0 && styles.disabledBtn]}>← Prev Section</Text>
+        </TouchableOpacity>
         <Text style={styles.sectionNavTitle}>{section.title}</Text>
-        <Text
-          style={[styles.sectionNavBtn, sectionIndex === handbookSections.length - 1 && styles.disabledBtn]}
-          onPress={() => sectionIndex < handbookSections.length - 1 && setSectionIndex(sectionIndex + 1)}
+        <TouchableOpacity
+          disabled={sectionIndex >= handbookSections.length - 1}
+          onPress={() => goToSection(sectionIndex + 1)}
         >
-          Next Section →
-        </Text>
+          <Text
+            style={[
+              styles.sectionNavBtn,
+              sectionIndex >= handbookSections.length - 1 && styles.disabledBtn,
+            ]}
+          >
+            Next Section →
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -86,6 +113,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 8,
     paddingHorizontal: 16,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 12,
   },
   page: {
     backgroundColor: "#181f2e",
@@ -127,6 +158,13 @@ const styles = StyleSheet.create({
     color: "#f4a300",
     fontSize: 14,
     flex: 1,
+  },
+  chapterNav: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 12,
+    gap: 12,
   },
   sectionNav: {
     flexDirection: "row",
